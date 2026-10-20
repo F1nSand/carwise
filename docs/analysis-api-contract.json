@@ -1,0 +1,381 @@
+{
+  "schema_version": "1.0",
+  "analysis_types": [
+    "price_distribution",
+    "mileage_price_correlation",
+    "model_comparison",
+    "brand_profile",
+    "region_gap",
+    "age_price_relation"
+  ],
+  "units": {
+    "price_yuan": "CNY",
+    "mileage_km": "km",
+    "age_years": "year"
+  },
+  "filters": {
+    "brands": [],
+    "series_selectors": [
+      {
+        "brand_name": "比亚迪",
+        "series": "秦PLUS"
+      }
+    ],
+    "cities": [],
+    "price_min_yuan": null,
+    "price_max_yuan": null,
+    "mileage_min_km": null,
+    "mileage_max_km": null,
+    "year_min": null,
+    "year_max": null,
+    "age_min_years": null,
+    "age_max_years": null,
+    "energy_types": []
+  },
+  "catalog": {
+    "dataset_version": "sha256:example",
+    "brands": [
+      "比亚迪"
+    ],
+    "series_selectors": [
+      {
+        "brand_name": "比亚迪",
+        "series": "秦PLUS"
+      }
+    ],
+    "cities": [
+      "北京"
+    ],
+    "energy_types": [
+      "纯电动",
+      "插电式混合动力",
+      "增程式"
+    ],
+    "fields": {
+      "price_yuan": {
+        "coverage": 1.0,
+        "unit": "CNY",
+        "supported_filter": true
+      },
+      "mileage_km": {
+        "coverage": 1.0,
+        "unit": "km",
+        "supported_filter": true
+      },
+      "production_year": {
+        "coverage": 1.0,
+        "unit": "year",
+        "supported_filter": true
+      },
+      "vehicle_age_years": {
+        "coverage": 0.9935,
+        "unit": "year",
+        "supported_filter": true
+      },
+      "city_name": {
+        "coverage": 0.9996,
+        "unit": null,
+        "supported_filter": true
+      },
+      "brand_name": {
+        "coverage": 1.0,
+        "unit": null,
+        "supported_filter": true
+      },
+      "series": {
+        "coverage": 1.0,
+        "unit": null,
+        "supported_filter": true
+      },
+      "energy_type": {
+        "coverage": 0.0857,
+        "unit": null,
+        "supported_filter": true
+      }
+    },
+    "ranges": {
+      "price_yuan": {
+        "min": 10000,
+        "max": 4990000
+      },
+      "mileage_km": {
+        "min": 0,
+        "max": 500000
+      },
+      "production_year": {
+        "min": 1990,
+        "max": 2024
+      },
+      "vehicle_age_years": {
+        "min": 0.0833,
+        "max": 32.75
+      }
+    },
+    "defaults": {
+      "filters": {
+        "brands": [],
+        "series_selectors": [],
+        "cities": [],
+        "price_min_yuan": null,
+        "price_max_yuan": null,
+        "mileage_min_km": null,
+        "mileage_max_km": null,
+        "year_min": null,
+        "year_max": null,
+        "age_min_years": null,
+        "age_max_years": null,
+        "energy_types": []
+      },
+      "params": {
+        "price_distribution": {
+          "bins": 20
+        },
+        "brand_profile": {
+          "top_k": 10
+        },
+        "region_gap": {
+          "min_city_n": 15
+        },
+        "age_price_relation": {
+          "bin_width_years": 1.0
+        }
+      }
+    },
+    "data_time_range": {
+      "status": "unknown",
+      "start": null,
+      "end": null
+    }
+  },
+  "query_request": {
+    "analysis_type": "price_distribution",
+    "filters": {},
+    "params": {
+      "bins": 20
+    },
+    "expected_dataset_version": "sha256:example"
+  },
+  "query_response": {
+    "schema_version": "1.0",
+    "analysis_type": "price_distribution",
+    "status": "success",
+    "reason_code": null,
+    "dataset_version": "sha256:example",
+    "normalized_filters": {},
+    "filters_applied": [],
+    "counts": {
+      "dataset_rows": 143793,
+      "scope_rows": 143793,
+      "valid_rows": 143793,
+      "excluded_rows": 0,
+      "missing_required_rows": 0
+    },
+    "data": {
+      "n": 143793,
+      "min_yuan": 10000,
+      "max_yuan": 4990000,
+      "mean_yuan": 100000,
+      "median_yuan": 85000,
+      "p25_yuan": 60000,
+      "p75_yuan": 130000,
+      "bins": [
+        {
+          "lower_yuan": 10000,
+          "upper_yuan": 259000,
+          "count": 120000,
+          "share": 0.8348,
+          "include_upper": false
+        }
+      ],
+      "bin_count": 20
+    },
+    "limitations": [],
+    "methodology": {
+      "price_basis": "挂牌价",
+      "quantile_interpolation": "linear",
+      "binning": "equal_width; left_closed_right_open; final_bin_closed"
+    }
+  },
+  "dashboard_response": {
+    "schema_version": "1.0",
+    "status": "success",
+    "dataset_version": "sha256:example",
+    "normalized_filters": {},
+    "overview": {
+      "dataset_rows": 143793,
+      "scope_rows": 143793,
+      "price_valid_rows": 143793,
+      "city_valid_rows": 143735,
+      "vehicle_age_valid_rows": 142855
+    },
+    "analyses": {
+      "price_distribution": {},
+      "mileage_price_correlation": {},
+      "model_comparison": {},
+      "brand_profile": {},
+      "region_gap": {},
+      "age_price_relation": {}
+    }
+  },
+  "data_schemas": {
+    "price_distribution": {
+      "n": "integer",
+      "min_yuan": "number|null",
+      "max_yuan": "number|null",
+      "mean_yuan": "number|null",
+      "median_yuan": "number|null",
+      "p25_yuan": "number|null",
+      "p75_yuan": "number|null",
+      "bins": [
+        {
+          "lower_yuan": "number",
+          "upper_yuan": "number",
+          "count": "integer",
+          "share": "number",
+          "include_upper": "boolean"
+        }
+      ]
+    },
+    "mileage_price_correlation": {
+      "n": "integer",
+      "pearson_r": "number|null",
+      "spearman_rho": "number|null",
+      "correlation_reason": "string|null",
+      "mileage_bins": [
+        {
+          "lower_km": "number",
+          "upper_km": "number",
+          "n": "integer",
+          "median_price_yuan": "number|null",
+          "p25_price_yuan": "number|null",
+          "p75_price_yuan": "number|null"
+        }
+      ],
+      "scatter": {
+        "total_points": "integer",
+        "display_points": "integer",
+        "sampled": "boolean",
+        "points": [
+          {
+            "mileage_km": "number",
+            "price_yuan": "number"
+          }
+        ]
+      }
+    },
+    "model_comparison": {
+      "groups": [
+        {
+          "brand_name": "string",
+          "series": "string",
+          "status": "success|empty",
+          "n": "integer",
+          "price": {
+            "n": "integer",
+            "min_yuan": "number|null",
+            "max_yuan": "number|null",
+            "median_yuan": "number|null",
+            "p25_yuan": "number|null",
+            "p75_yuan": "number|null"
+          },
+          "mileage": {
+            "n": "integer",
+            "median_km": "number|null"
+          },
+          "age": {
+            "n": "integer",
+            "median_years": "number|null"
+          },
+          "support": {
+            "low_sample": "boolean"
+          }
+        }
+      ]
+    },
+    "brand_profile": {
+      "denominator_n": "integer",
+      "groups": [
+        {
+          "brand_name": "string",
+          "n": "integer",
+          "share": "number|null",
+          "price": {
+            "n": "integer",
+            "min": "number|null",
+            "max": "number|null",
+            "median": "number|null",
+            "p25": "number|null",
+            "p75": "number|null"
+          },
+          "series_count": "integer",
+          "mileage": {
+            "n": "integer",
+            "median_km": "number|null"
+          },
+          "age": {
+            "n": "integer",
+            "median_years": "number|null"
+          },
+          "category": "brand|other|unknown"
+        }
+      ]
+    },
+    "region_gap": {
+      "baseline_median_yuan": "number|null",
+      "baseline_n": "integer",
+      "baseline_label": "filtered_sample|selected_city_sample",
+      "valid_city_count": "integer",
+      "cities": [
+        {
+          "city": "string",
+          "n": "integer",
+          "median_yuan": "number|null",
+          "p25_yuan": "number|null",
+          "p75_yuan": "number|null",
+          "diff_yuan": "number|null",
+          "diff_pct": "number|null",
+          "eligible": "boolean",
+          "low_sample": "boolean"
+        }
+      ]
+    },
+    "age_price_relation": {
+      "n": "integer",
+      "missing_age_n": "integer",
+      "correlation": {
+        "pearson_r": "number|null",
+        "spearman_rho": "number|null",
+        "reason": "string|null"
+      },
+      "bins": [
+        {
+          "lower_years": "number",
+          "upper_years": "number",
+          "n": "integer",
+          "median_price_yuan": "number|null",
+          "p25_price_yuan": "number|null",
+          "p75_price_yuan": "number|null"
+        }
+      ],
+      "scatter": {
+        "total_points": "integer",
+        "display_points": "integer",
+        "sampled": "boolean",
+        "points": [
+          {
+            "age_years": "number",
+            "price_yuan": "number"
+          }
+        ]
+      }
+    }
+  },
+  "dashboard_analysis_keys": [
+    "price_distribution",
+    "mileage_price_correlation",
+    "model_comparison",
+    "brand_profile",
+    "region_gap",
+    "age_price_relation"
+  ]
+}

@@ -1,0 +1,46 @@
+:root {
+  --color-canvas: #f4f2ed;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #eeeee7;
+  --color-ink: #202821;
+  --color-ink-soft: #505c53;
+  --color-ink-muted: #636e64;
+  --color-navy: #202821;
+  --color-navy-soft: #e8ebe4;
+  --color-teal: #254d3b;
+  --color-teal-soft: #e5ede4;
+  --color-orange: #a74b30;
+  --color-orange-soft: #faeee7;
+  --color-danger: #b42318;
+  --color-danger-soft: #fff0ee;
+  --color-border: #dedfd7;
+  --color-border-strong: #bac2b7;
+  --shadow-card: 0 14px 32px rgb(32 40 33 / 0.06);
+  --shadow-soft: 0 4px 14px rgb(32 40 33 / 0.04);
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --container: 1360px;
+  --topbar-height: 76px;
+  --ease-standard: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-exit: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-layout: cubic-bezier(0.77, 0, 0.175, 1);
+  --duration-fast: 120ms;
+  --duration-standard: 240ms;
+  --duration-page: 240ms;
+  --font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+}
+
+@media (max-width: 760px) { :root { --topbar-height: 98px; } }

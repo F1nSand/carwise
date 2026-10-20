@@ -1,0 +1,10 @@
+{
+  "asset": "automotive-atlas-hero.webp",
+  "generated_tool": "built-in image_gen",
+  "source_path": "frontend/public/images/automotive-atlas-hero-source.png (generated original; removed after conversion)",
+  "prompt": "Photorealistic premium automotive editorial homepage hero photograph, ultra-wide landscape 16:9. Deep forest green unbranded modern luxury sedan occupies the right half to right two-thirds, full vehicle visible, three-quarter front-side angle, facing slightly toward viewer and left. Contemporary architectural pavilion in brushed charcoal metal and modernist concrete; overcast soft daylight, precise subtle linear reflections, warm material details, controlled low-key reflections. Left 30–40% is dark charcoal and forest-green architectural negative space, calm and uncluttered for white Chinese headline overlay. Cinematic luxury automotive print campaign, realistic paint, glass and tires; car clearly visible. Absolutely no text, numbers, logo, people, watermark, UI, mockup, neon, sci-fi, silhouette or crushed blacks.",
+  "generated_image_notice": "AI-generated illustrative automotive visual; not a real vehicle listing or source photo.",
+  "dimensions": "1672x942",
+  "format": "WebP",
+  "conversion": "ffmpeg libwebp quality=86 method=6"
+}

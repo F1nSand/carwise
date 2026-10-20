@@ -1,0 +1,79 @@
+# Secrets and machine-specific configuration
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.credentials.json
+
+# Python environments and generated files
+.venv/
+venv/
+.audit-*/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.pytest-*/
+.tmp-*/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Frontend dependencies, builds and coverage
+node_modules/
+dist/
+coverage/
+.vite/
+*.tsbuildinfo
+
+# Runtime: conversations, owner secrets, databases, reports and logs
+.cache/
+*.sqlite*
+*.db
+*.db-*
+*.log
+artifacts/
+reports/
+outputs/
+
+# Local datasets: supply your own licensed data (see README)
+data/
+国内二手车交易数据集（20列，143793条记录）CSV/
+
+# Local tools and design/exploration artifacts (.agent/skills is runtime source)
+.playwright-cli/
+.playwright-mcp/
+.serena/
+.workbuddy/
+.impeccable/
+.idea/
+.vscode/
+design-system/
+docs/plans/
+docs/superpowers/
+docs/2026-*.md
+evals/*progress.md
+progress.md
+PRODUCT.md
+DESIGN.md
+毕设设计思路与Agent实现方案.md
+智能分析.txt
+search_result_*.txt
+2026_09_11_10_39_20.png
+
+# OS files and temporary archives
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.bak
+*.tar
+*.tar.gz
+*.zip
+
+frontend/deploy-progress.md

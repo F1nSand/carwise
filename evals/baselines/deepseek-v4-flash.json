@@ -1,0 +1,9 @@
+{
+  "suite_version": "v1",
+  "pass_rate": 1.0,
+  "scores": {
+    "terminal": 1.0
+  },
+  "avg_tokens": 0,
+  "hard_violations": 0
+}

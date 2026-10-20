@@ -1,0 +1,92 @@
+{
+  "fixture_version": 1,
+  "provenance": "Redacted replay shape from a local Agent failure. Runtime, account, session, call, provider, timestamp, and dataset fingerprint identifiers are omitted or replaced. Candidate names and aggregate values are retained because they are the facts under test.",
+  "input": {
+    "user_text": "15 万以内、3 年内的增程式车型推荐几款",
+    "goal": {
+      "id": "g1",
+      "description": "推荐符合预算、车龄和能源条件的车系",
+      "deliverable": "命名的候选车系及价格统计"
+    },
+    "requires_plan": false
+  },
+  "tool_output": {
+    "ok": true,
+    "result_status": "success",
+    "budget_min_wan": 0.0,
+    "budget_max_wan": 15.0,
+    "energy_type": "增程式",
+    "filters_applied": [
+      "价格在 (0, 5000000) 元区间内",
+      "挂牌价在 0~15 万元之间",
+      "能源类型 = 增程式",
+      "车龄 <= 3 年",
+      "仅纳入样本量 >= 15 台的车系"
+    ],
+    "budget_count": 153,
+    "n_candidates": 3,
+    "weights": {"popularity": 0.5, "newness": 0.3, "low_mileage": 0.2},
+    "recommendations": [
+      {
+        "series": "深蓝SL03",
+        "brand": "深蓝汽车",
+        "sample_size": 46,
+        "median_wan": 11.3,
+        "p25_wan": 10.58,
+        "p75_wan": 11.76,
+        "median_year": 2022,
+        "median_mileage_wan_km": 1.7,
+        "score": 0.787
+      },
+      {
+        "series": "零跑C11",
+        "brand": "零跑汽车",
+        "sample_size": 26,
+        "median_wan": 12.88,
+        "p25_wan": 12.03,
+        "p75_wan": 13.58,
+        "median_year": 2023,
+        "median_mileage_wan_km": 0.8,
+        "score": 0.5
+      },
+      {
+        "series": "岚图FREE",
+        "brand": "岚图",
+        "sample_size": 31,
+        "median_wan": 14.6,
+        "p25_wan": 13.88,
+        "p75_wan": 14.82,
+        "median_year": 2021,
+        "median_mileage_wan_km": 3.8,
+        "score": 0.125
+      }
+    ],
+    "confidence": "high",
+    "note": "预算 0~15 万元，在 153 条车源中筛出 3 个可选车系；排序综合热度、车龄与里程权重，均为挂牌价口径。"
+  },
+  "observed_model_visible_compaction": {
+    "tool_name": "recommend",
+    "status": "success",
+    "statistics": {"series": null, "budget_count": 153, "n_candidates": 3},
+    "recommendations": null,
+    "evidence_metrics": [
+      "recommendations.0.median_wan",
+      "recommendations.1.median_wan",
+      "recommendations.2.median_wan"
+    ],
+    "note": "模型输入中保留了聚合数值证据，但没有候选车系名称。"
+  },
+  "observed_answer_excerpt": {
+    "narrative": [
+      "推荐工具返回的候选车系未附带车系名称，因此仅能按推荐位次给出统计，无法点名具体车系。"
+    ],
+    "limitations": [
+      "无法在回答中点名具体车系；如需名称，请补充品牌或车系线索。"
+    ]
+  },
+  "expected_candidate_series": ["深蓝SL03", "零跑C11", "岚图FREE"],
+  "expected_regressions": [
+    "compacted_recommendations_keep_entity_to_metric_binding",
+    "entity_names_are_available_to_the_answer_drafter"
+  ]
+}

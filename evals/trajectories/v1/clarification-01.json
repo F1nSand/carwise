@@ -1,0 +1,116 @@
+{
+  "version": 2,
+  "responses": [
+    {
+      "tool_calls": [
+        {
+          "id": "eval-declare-clarification-01-0",
+          "name": "declare_task",
+          "arguments": {
+            "goals": [
+              {
+                "id": "eval_goal",
+                "description": "帮我找车",
+                "deliverable": "Complete the requested analysis"
+              }
+            ],
+            "requires_plan": true
+          }
+        },
+        {
+          "name": "set_plan",
+          "arguments": {
+            "steps": [
+              {
+                "id": "query",
+                "title": "确认用户条件",
+                "description": "执行当前阶段并保留明确的结果边界",
+                "tool_names": [
+                  "ask_user"
+                ],
+                "goal_ids": [
+                  "eval_goal"
+                ],
+                "kind": "clarification",
+                "completion_criteria": "user_answer"
+              },
+              {
+                "id": "finalize",
+                "title": "整理并核验回答",
+                "description": "执行当前阶段并保留明确的结果边界",
+                "tool_names": [
+                  "finalize_answer"
+                ],
+                "goal_ids": [
+                  "eval_goal"
+                ],
+                "kind": "finalize",
+                "completion_criteria": "validated_answer"
+              }
+            ]
+          }
+        },
+        {
+          "id": "ask-1",
+          "name": "ask_user",
+          "arguments": {
+            "questions": [
+              {
+                "id": "budget",
+                "prompt": "预算上限是多少？",
+                "options": [
+                  {
+                    "id": "a",
+                    "label": "15万",
+                    "value": "15万"
+                  }
+                ],
+                "allow_custom": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "update_plan",
+          "arguments": {
+            "updates": [
+              {
+                "id": "query",
+                "status": "complete"
+              },
+              {
+                "id": "finalize",
+                "status": "running"
+              }
+            ]
+          }
+        },
+        {
+          "name": "finalize_answer",
+          "arguments": {
+            "schema_version": 2,
+            "result_kind": "explanation",
+            "goal_ids": [
+              "eval_goal"
+            ],
+            "blocks": [
+              {
+                "kind": "text",
+                "text": "已收到你确认的预算条件，可据此继续查询二手车。"
+              }
+            ],
+            "limitation_codes": []
+          }
+        }
+      ]
+    }
+  ],
+  "protocol": {
+    "task_plan": 1,
+    "answer_schema": 2
+  }
+}

@@ -1,0 +1,174 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-canvas);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+html {
+  min-width: 320px;
+  /* Keep the viewport's content width unchanged between scrollable pages
+     and the full-height chat workspace. */
+  scrollbar-gutter: stable;
+  background: var(--color-canvas);
+  scroll-behavior: smooth;
+  scrollbar-color: var(--color-border-strong) transparent;
+  scrollbar-width: thin;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100dvh;
+  margin: 0;
+  overflow-x: clip;
+  font-size: 14px;
+  line-height: 1.6;
+  background: var(--color-canvas);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+input,
+textarea {
+  caret-color: var(--color-teal);
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-container {
+  width: min(var(--container), calc(100% - 48px));
+  margin: 0 auto;
+}
+
+/* Page motion stays inside its own surface instead of widening the document. */
+.route-host {
+  overflow: clip;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-teal);
+  outline-offset: 3px;
+}
+
+button:not(:disabled) {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--ease-standard);
+}
+
+button:not(:disabled):active:not(:focus-visible) {
+  transform: scale(0.985);
+  transition: transform 90ms var(--ease-standard);
+}
+
+@media (pointer: coarse) {
+  button:not(:disabled),
+  a.button,
+  .topbar__link {
+    min-height: 44px;
+  }
+}
+
+.route-forward-enter-active, .route-back-enter-active { transition: transform 260ms var(--ease-standard), clip-path 260ms var(--ease-standard), opacity 180ms ease-out; }
+.route-forward-leave-active, .route-back-leave-active { transition: transform 150ms var(--ease-exit), opacity 150ms ease-out; pointer-events: none; }
+.route-forward-enter-from { transform: translate3d(30px, 12px, 0); clip-path: inset(0 0 6% 0); opacity: .3; }
+.route-back-enter-from { transform: translate3d(-30px, 12px, 0); clip-path: inset(0 0 6% 0); opacity: .3; }
+.route-forward-leave-to { transform: translate3d(-16px, -3px, 0); opacity: 0; }
+.route-back-leave-to { transform: translate3d(16px, -3px, 0); opacity: 0; }
+
+.state-fade-enter-active,
+.state-fade-leave-active {
+  transition: opacity var(--duration-standard) var(--ease-standard), transform var(--duration-standard) var(--ease-standard);
+}
+
+.state-fade-leave-active {
+  transition-duration: 150ms;
+  transition-timing-function: var(--ease-exit);
+}
+
+.state-fade-enter-from {
+  opacity: 0;
+  transform: translateY(7px);
+}
+
+.state-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-3px);
+}
+
+.activity-list-motion-enter-active,
+.activity-list-motion-leave-active,
+.plan-list-motion-enter-active,
+.plan-list-motion-leave-active {
+  transition: opacity 180ms var(--ease-standard), transform 180ms var(--ease-standard);
+}
+
+.activity-list-motion-move,
+.plan-list-motion-move {
+  transition: transform 220ms var(--ease-standard);
+}
+
+.activity-list-motion-enter-from,
+.activity-list-motion-leave-to,
+.plan-list-motion-enter-from,
+.plan-list-motion-leave-to {
+  opacity: 0;
+  transform: translateY(5px);
+}
+
+::selection {
+  color: #fff;
+  background: var(--color-teal);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-forward-enter-from, .route-forward-leave-to, .route-back-enter-from, .route-back-leave-to { transform: none; clip-path: none; opacity: 1; }
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .state-fade-enter-from,
+  .state-fade-leave-to,
+  .activity-list-motion-enter-from,
+  .activity-list-motion-leave-to,
+  .plan-list-motion-enter-from,
+  .plan-list-motion-leave-to {
+    transform: none;
+  }
+
+  button:not(:disabled):active:not(:focus-visible) {
+    transform: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .page-container {
+    width: min(100% - 32px, var(--container));
+  }
+}

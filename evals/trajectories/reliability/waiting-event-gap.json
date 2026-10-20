@@ -1,0 +1,28 @@
+{
+  "fixture_version": 1,
+  "case_id": "waiting_snapshot_missing_notification",
+  "provenance": "Sanitized shape from a local runtime incident; no owner, prompt, credentials, or raw provider payload retained.",
+  "baseline": {
+    "submitted_to_first_model_event_ms": 13070,
+    "model_round_count": 4,
+    "model_duration_total_ms": 15215,
+    "submitted_to_waiting_user_ms": 20940,
+    "last_persisted_event": "tool_started",
+    "pending_question_count_in_snapshot": 1,
+    "input_required_event_count": 0
+  },
+  "observed_state": {
+    "run_status": "waiting_user",
+    "checkpoint_has_pending_input": true,
+    "snapshot_has_pending_input": true,
+    "terminal_result_exists": false,
+    "last_event_type": "tool_started"
+  },
+  "expected_invariants": [
+    "waiting_user snapshot contains a non-empty pending question",
+    "the waiting transition persists exactly one input_required event atomically",
+    "the frontend hydrates the pending question from the snapshot if SSE omits it",
+    "the frontend never reports a missing final result for a waiting run"
+  ],
+  "measurement_note": "The approximately 4.9 seconds between the first model event timestamp and recorded model duration is uninstrumented and intentionally left unattributed."
+}

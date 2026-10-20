@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "responses": [
+    {
+      "failure": "injected provider failure"
+    }
+  ],
+  "protocol": {
+    "task_plan": 1,
+    "answer_schema": 2
+  }
+}

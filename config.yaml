@@ -1,0 +1,108 @@
+# 二手车智能分析系统 — 数据清洗管道配置（Step 0 骨架）
+# 路径均相对本文件所在目录（项目根），换电脑只需整体拷贝项目目录。
+# 本配置供 etl/clean_dcd.py 读取；探查脚本 outputs/项目内容整理/ 保持不动。
+
+paths:
+  raw_csv: 国内二手车交易数据集（20列，143793条记录）CSV/dcd.csv
+  repaired_csv: data/tmp/dcd_repaired.csv      # 修复中间件（审计留痕）
+  clean_csv: data/clean/dcd_clean.csv
+  clean_parquet: data/clean/dcd_clean.parquet
+  field_metrics_csv: reports/field_metrics.csv
+  clean_report_md: reports/clean_report.md
+
+# ===== 原始文件版式（已用 csv.reader 全量实证，勿改） =====
+layout:
+  total_header_cols: 20
+  # 表头 20 列；数据行实测 100% 为 21 字段 =
+  #   表头前 16 列(id~原产地价格) + 冗余 0/1 列(索引16) + 档案详情/相关参数/用车成本/公司名称
+  row_extra_col_idx: 16
+  extra_col_allowed: ["0", "1"]
+  # 剔除项：固定价格列 100% 为"暂无报价"（可用率 0%），随冗余 0/1 列一起不进清洗结果
+  drop_columns_from_header: [固定价格]
+
+# ===== 表头保留列（顺序即输出原始列顺序，19 列） =====
+# 说明：原始列作为溯源保留原文；标准化/展开结果见下方派生列。
+
+# ===== 3 个嵌套 JSON 字段的展开键表 =====
+# type: text | int | float | date_text ；展开后列名为 name 字段
+json_fields:
+  档案详情:
+    keys:
+      排放标准: {name: emission_standard, type: text}
+      能源类型: {name: energy_type, type: text}
+      车源地: {name: car_origin, type: text}
+      上牌时间: {name: archive_reg_time, type: date_text}     # 形如 2021-08
+      表显里程: {name: archive_mileage_text, type: text}
+  相关参数:
+    keys:
+      发动机: {name: engine_name, type: text}
+      变速箱: {name: gearbox, type: text}
+      驱动方式: {name: drive_type, type: text}
+      轴距: {name: wheelbase_mm, type: int}                    # '2800mm' → 2800
+      百公里加速: {name: accel_0_100_s, type: float}           # '6.9s' → 6.9
+      最大功率: {name: max_power_kw, type: float}              # '135kW'/'184马力' 取首个数字
+  用车成本:
+    keys:
+      百公里油耗: {name: fuel_consumption, type: float}        # '7.1' L/100km
+      百公里电耗: {name: elec_consumption, type: float}
+      年均保险费: {name: annual_insurance, type: float}
+      年均保养费: {name: annual_maintenance, type: float}
+
+# ===== 标准化与异常阈值 =====
+standardize:
+  # 生产年份上界 = current_year + 1；车龄交叉核验以 current_year 为基准
+  current_year: 2026
+  anomaly:
+    price_min_yuan: 0            # 价格 <=0 判异常
+    price_max_yuan: 5000000      # 价格 >=500万 判异常
+    mileage_max_km: 600000       # 里程 >=60万公里 判异常
+    year_min: 1980
+  # 整值命中这些模式视为缺失（“暂无统一转空”）; 另含空串/纯空白
+  text_missing_patterns: ["暂无", "无", "--", "-", "None", "nan", "N/A", "NA", "未填写"]
+
+report:
+  sample_rows_for_compare: 3     # 修复前后抽样对照行数
+
+# Agent 上限：输入/输出预算独立配置，计量覆盖消息和工具 schema。
+agent_runtime:
+  context:
+    max_input_tokens: 524288
+    max_output_tokens: 65536
+    max_input_characters: 1500000
+    safety_margin_tokens: 4096
+    min_recent_turns: 2
+    max_single_tool_result_tokens: 6000
+  model_capabilities:
+    deepseek-v4-flash:
+      max_context_tokens: 1000000
+      max_output_tokens: 384000
+  scheduler:
+    max_concurrency: 4
+    max_queue_size: 32
+    run_timeout_seconds: 600
+    heartbeat_interval_seconds: 5
+    lease_ttl_seconds: 30
+    shutdown_grace_seconds: 15
+  mcp:
+    timeout_seconds: 10
+    max_workers: 8
+    failure_threshold: 3
+    cooldown_seconds: 60
+  network:
+    connect_timeout_seconds: 10
+    read_timeout_seconds: 300
+  budget:
+    model_calls: 12
+    tool_executions: 24
+    answer_repairs: 2
+    replans: 2
+    active_execution_seconds: 600
+    truncation_retries: 1
+  features:
+    midrun_input: false
+    recovery: false
+    tool_parallelism: false
+
+# 本地单节点 runtime 数据库；SQLite 不用于网络文件系统多主机共享。
+storage:
+  url: sqlite:///.cache/runtime.sqlite3

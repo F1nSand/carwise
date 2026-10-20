@@ -1,0 +1,104 @@
+{
+  "version": 2,
+  "responses": [
+    {
+      "tool_calls": [
+        {
+          "id": "eval-declare-price_comparison-02-0",
+          "name": "declare_task",
+          "arguments": {
+            "goals": [
+              {
+                "id": "eval_goal",
+                "description": "比较该车系挂牌价",
+                "deliverable": "Complete the requested analysis"
+              }
+            ],
+            "requires_plan": true
+          }
+        },
+        {
+          "name": "set_plan",
+          "arguments": {
+            "steps": [
+              {
+                "id": "query",
+                "title": "查询并核对数据",
+                "description": "执行当前阶段并保留明确的结果边界",
+                "tool_names": [
+                  "price_compare"
+                ],
+                "goal_ids": [
+                  "eval_goal"
+                ],
+                "kind": "data",
+                "completion_criteria": "tool_result"
+              },
+              {
+                "id": "finalize",
+                "title": "整理并核验回答",
+                "description": "执行当前阶段并保留明确的结果边界",
+                "tool_names": [
+                  "finalize_answer"
+                ],
+                "goal_ids": [
+                  "eval_goal"
+                ],
+                "kind": "finalize",
+                "completion_criteria": "validated_answer"
+              }
+            ]
+          }
+        },
+        {
+          "id": "call-1",
+          "name": "price_compare",
+          "arguments": {
+            "series": "雅阁",
+            "year": 2020
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "update_plan",
+          "arguments": {
+            "updates": [
+              {
+                "id": "query",
+                "status": "complete"
+              },
+              {
+                "id": "finalize",
+                "status": "running"
+              }
+            ]
+          }
+        },
+        {
+          "name": "finalize_answer",
+          "arguments": {
+            "schema_version": 2,
+            "result_kind": "no_data",
+            "goal_ids": [
+              "eval_goal"
+            ],
+            "blocks": [
+              {
+                "kind": "text",
+                "text": "当前条件没有可用于回答的数据，请调整筛选条件。"
+              }
+            ],
+            "limitation_codes": []
+          }
+        }
+      ]
+    }
+  ],
+  "protocol": {
+    "task_plan": 1,
+    "answer_schema": 2
+  }
+}

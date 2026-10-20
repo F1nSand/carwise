@@ -1,0 +1,131 @@
+{
+  "version": 2,
+  "provider": "scripted_offline_only",
+  "case_id": "reliability-price-a4l-plan-answer",
+  "input": "2022 年的奥迪 A4L 大概什么价格",
+  "expected": {
+    "status": "done",
+    "visible_plan_steps": [
+      "查询符合条件的价格分布",
+      "整理并核验回答"
+    ],
+    "answer_contains": [
+      "奥迪 A4L",
+      "挂牌价中位数"
+    ]
+  },
+  "responses": [
+    {
+      "tool_calls": [
+        {
+          "name": "declare_task",
+          "arguments": {
+            "goals": [
+              {
+                "id": "g1",
+                "description": "查询奥迪 A4L 指定生产年份的挂牌价分布",
+                "deliverable": "价格区间和中位价"
+              }
+            ],
+            "requires_plan": false
+          }
+        },
+        {
+          "name": "set_plan",
+          "arguments": {
+            "steps": [
+              {
+                "id": "query_price",
+                "title": "查询符合条件的价格分布",
+                "description": "查询奥迪 A4L 在指定年份的挂牌价统计",
+                "tool_names": [
+                  "price_compare"
+                ],
+                "goal_ids": [
+                  "g1"
+                ],
+                "kind": "data",
+                "completion_criteria": "tool_result"
+              },
+              {
+                "id": "finalize",
+                "title": "整理并核验回答",
+                "description": "引用本次查询证据整理价格区间和口径说明",
+                "tool_names": [
+                  "finalize_answer"
+                ],
+                "goal_ids": [
+                  "g1"
+                ],
+                "kind": "finalize",
+                "completion_criteria": "validated_answer"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "price_compare",
+          "arguments": {
+            "series": "奥迪A4L",
+            "year": 2022
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "update_plan",
+          "arguments": {
+            "updates": [
+              {
+                "id": "query_price",
+                "status": "complete"
+              },
+              {
+                "id": "finalize",
+                "status": "running"
+              }
+            ]
+          }
+        },
+        {
+          "name": "finalize_answer",
+          "arguments": {
+            "schema_version": 2,
+            "result_kind": "data_answer",
+            "goal_ids": [
+              "g1"
+            ],
+            "blocks": [
+              {
+                "kind": "text",
+                "text": "按本次查询，"
+              },
+              {
+                "kind": "fact_ref",
+                "evidence_id": {
+                  "$evidence_ref": {
+                    "metric": "price.median_yuan"
+                  }
+                },
+                "format": "sentence"
+              }
+            ],
+            "limitation_codes": [
+              "listing_price_not_transaction"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "protocol": {
+    "task_plan": 1,
+    "answer_schema": 2
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "version": 2,
+  "provider": "scripted_offline_only",
+  "case_id": "reliability-recommend-named-entities",
+  "input": "15 万以内、3 年内的增程式车型推荐几款",
+  "expected": {
+    "status": "done",
+    "visible_plan_steps": [
+      "查询命名候选及关联统计",
+      "整理并核验回答"
+    ],
+    "answer_contains_entities": [
+      "深蓝SL03",
+      "零跑C11",
+      "岚图FREE"
+    ],
+    "entity_values_remain_bound": true
+  },
+  "responses": [
+    {
+      "tool_calls": [
+        {
+          "name": "declare_task",
+          "arguments": {
+            "goals": [
+              {
+                "id": "g1",
+                "description": "推荐符合条件且名称与统计相绑定的车系",
+                "deliverable": "命名候选车系及各自价格统计"
+              }
+            ],
+            "requires_plan": false
+          }
+        },
+        {
+          "name": "set_plan",
+          "arguments": {
+            "steps": [
+              {
+                "id": "recommend_named",
+                "title": "查询命名候选及关联统计",
+                "description": "按预算、车龄和能源条件查询候选车系与价格指标",
+                "tool_names": [
+                  "recommend"
+                ],
+                "goal_ids": [
+                  "g1"
+                ],
+                "kind": "data",
+                "completion_criteria": "tool_result"
+              },
+              {
+                "id": "finalize",
+                "title": "整理并核验回答",
+                "description": "确保每个推荐车系与其指标、筛选条件和证据对应",
+                "tool_names": [
+                  "finalize_answer"
+                ],
+                "goal_ids": [
+                  "g1"
+                ],
+                "kind": "finalize",
+                "completion_criteria": "validated_answer"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "recommend",
+          "arguments": {
+            "budget_max_wan": 15,
+            "energy_type": "增程式",
+            "max_age": 3,
+            "top_k": 3,
+            "min_n": 15
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "update_plan",
+          "arguments": {
+            "updates": [
+              {
+                "id": "recommend_named",
+                "status": "complete"
+              },
+              {
+                "id": "finalize",
+                "status": "running"
+              }
+            ]
+          }
+        },
+        {
+          "name": "finalize_answer",
+          "arguments": {
+            "schema_version": 2,
+            "result_kind": "data_answer",
+            "goal_ids": [
+              "g1"
+            ],
+            "blocks": [
+              {
+                "kind": "recommendation_table",
+                "entity_group_refs": {
+                  "$entity_group_refs": [
+                    0,
+                    1,
+                    2
+                  ]
+                },
+                "columns": [
+                  "series",
+                  "median_price",
+                  "price_interval",
+                  "sample_size"
+                ]
+              }
+            ],
+            "limitation_codes": [
+              "listing_price_not_transaction",
+              "sample_scope"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "protocol": {
+    "task_plan": 1,
+    "answer_schema": 2
+  }
+}

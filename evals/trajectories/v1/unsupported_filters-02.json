@@ -1,0 +1,92 @@
+{
+  "version": 2,
+  "responses": [
+    {
+      "tool_calls": [
+        {
+          "id": "eval-declare-unsupported_filters-02-0",
+          "name": "declare_task",
+          "arguments": {
+            "goals": [
+              {
+                "id": "eval_goal",
+                "description": "按不支持条件筛选",
+                "deliverable": "Complete the requested analysis"
+              }
+            ],
+            "requires_plan": true
+          }
+        },
+        {
+          "name": "set_plan",
+          "arguments": {
+            "steps": [
+              {
+                "id": "query",
+                "title": "查询并核对数据",
+                "description": "执行当前阶段并保留明确的结果边界",
+                "tool_names": [
+                  "recommend"
+                ],
+                "goal_ids": [
+                  "eval_goal"
+                ],
+                "kind": "data",
+                "completion_criteria": "tool_result"
+              },
+              {
+                "id": "finalize",
+                "title": "整理并核验回答",
+                "description": "执行当前阶段并保留明确的结果边界",
+                "tool_names": [
+                  "finalize_answer"
+                ],
+                "goal_ids": [
+                  "eval_goal"
+                ],
+                "kind": "finalize",
+                "completion_criteria": "validated_answer"
+              }
+            ]
+          }
+        },
+        {
+          "id": "call-1",
+          "name": "recommend",
+          "arguments": {
+            "budget_min_wan": 0,
+            "budget_max_wan": 15,
+            "body_type": "SUV"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "ask_user",
+          "arguments": {
+            "questions": [
+              {
+                "id": "unsupported_condition",
+                "prompt": "当前数据不支持车身类型筛选，是否去掉该条件后继续？",
+                "options": [
+                  {
+                    "id": "remove",
+                    "label": "去掉不支持的条件",
+                    "value": "remove_body_type"
+                  }
+                ],
+                "allow_custom": true
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "protocol": {
+    "task_plan": 1,
+    "answer_schema": 2
+  }
+}

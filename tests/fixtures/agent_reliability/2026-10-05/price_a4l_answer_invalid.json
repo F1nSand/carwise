@@ -1,0 +1,106 @@
+{
+  "fixture_version": 1,
+  "provenance": "Redacted replay shape from a local Agent failure. Runtime, account, session, call, provider, timestamp, and dataset fingerprint identifiers are omitted or replaced.",
+  "input": {
+    "user_text": "2022 年的奥迪 A4L 大概什么价格",
+    "goal": {
+      "id": "g1",
+      "description": "查询指定车系和年份的挂牌价分布",
+      "deliverable": "价格区间和中位价"
+    },
+    "requires_plan": false
+  },
+  "evidence": [
+    {
+      "evidence_id": "fixture-price-median",
+      "dataset_version": "fixture-dataset-v1",
+      "constraint_revision": 0,
+      "metric": "price.median_yuan",
+      "value": 209800,
+      "unit": "CNY",
+      "filters": ["车系 = 奥迪A4L", "生产年份 = 2022"],
+      "sample_size": 261,
+      "scope": "population"
+    },
+    {
+      "evidence_id": "fixture-price-p25",
+      "dataset_version": "fixture-dataset-v1",
+      "constraint_revision": 0,
+      "metric": "price.p25_yuan",
+      "value": 198000,
+      "unit": "CNY",
+      "filters": ["车系 = 奥迪A4L", "生产年份 = 2022"],
+      "sample_size": 261,
+      "scope": "population"
+    },
+    {
+      "evidence_id": "fixture-price-p75",
+      "dataset_version": "fixture-dataset-v1",
+      "constraint_revision": 0,
+      "metric": "price.p75_yuan",
+      "value": 225000,
+      "unit": "CNY",
+      "filters": ["车系 = 奥迪A4L", "生产年份 = 2022"],
+      "sample_size": 261,
+      "scope": "population"
+    }
+  ],
+  "repaired_draft": {
+    "claims": [
+      {
+        "claim_id": "c1",
+        "evidence_id": "fixture-price-median",
+        "metric": "price.median_yuan",
+        "value": 209800,
+        "unit": "CNY",
+        "label": "挂牌价中位数",
+        "scope": "population",
+        "filters": ["车系=奥迪A4L", "生产年份=2022"]
+      },
+      {
+        "claim_id": "c2",
+        "evidence_id": "fixture-price-p25",
+        "metric": "price.p25_yuan",
+        "value": 198000,
+        "unit": "CNY",
+        "label": "挂牌价低分位",
+        "scope": "population",
+        "filters": ["车系=奥迪A4L", "生产年份=2022"]
+      },
+      {
+        "claim_id": "c3",
+        "evidence_id": "fixture-price-p75",
+        "metric": "price.p75_yuan",
+        "value": 225000,
+        "unit": "CNY",
+        "label": "挂牌价高分位",
+        "scope": "population",
+        "filters": ["车系=奥迪A4L", "生产年份=2022"]
+      }
+    ],
+    "limitations": [
+      "统计仅针对奥迪 A4L 的该生产年份车源，未区分配置、里程、车况与城市。"
+    ],
+    "narrative": [
+      "您关注的奥迪 A4L（该生产年份）全国平台挂牌价中位数约为 {{claim:c1}}。",
+      "主流挂牌区间参考：低四分位约 {{claim:c2}}，高四分位约 {{claim:c3}}。",
+      "以上均为平台挂牌价而非成交价；同一车系不同配置会造成差异。"
+    ],
+    "goal_ids": ["g1"]
+  },
+  "observed_failure": {
+    "status": "error",
+    "failure_code": "answer_invalid",
+    "tool_sequence": ["declare_task", "load_skill", "price_compare", "finalize_answer", "finalize_answer"],
+    "task_mode": "simple",
+    "plan_step_count": 0,
+    "repair_attempt_count": 2,
+    "rejection_codes": ["answer_validation_failed", "answer_repair_exhausted"],
+    "diagnostic_excerpt": "校验把 A4L、低四分位、高四分位、同一等正常表达误判为未绑定数字。"
+  },
+  "expected_regressions": [
+    "single_goal_tasks_require_a_real_plan",
+    "trusted_entity_and_metric_words_are_not_free_numbers",
+    "a_successful_data_answer_is_nonempty"
+  ]
+}

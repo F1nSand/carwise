@@ -1,0 +1,12 @@
+{
+  "name": "used-car-intelligence",
+  "private": true,
+  "engines": { "node": ">=22" },
+  "version": "1.0.0",
+  "description": "二手车智能分析 Agent 全栈启动编排",
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "dev": "node scripts/dev.mjs",
+    "start": "npm run dev"
+  }
+}

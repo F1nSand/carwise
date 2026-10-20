@@ -1,0 +1,45 @@
+{
+  "fixture_version": 1,
+  "provenance": "Redacted replay shape from a local Agent failure. Runtime, account, session, call, provider, timestamp, and dataset fingerprint identifiers are omitted or replaced.",
+  "input": {
+    "user_text": "15 万以内、3 年内的增程式车型都有些什么",
+    "goal": {
+      "id": "g1",
+      "description": "推荐符合预算、车龄和能源条件的车系",
+      "deliverable": "候选车系和挂牌价特征"
+    },
+    "requires_plan": false
+  },
+  "trusted_conditions": [
+    "挂牌价在 0~15 万元之间",
+    "能源类型 = 增程式",
+    "车龄 <= 3 年",
+    "仅纳入样本量 >= 15 台的车系"
+  ],
+  "observed_draft_excerpt": {
+    "narrative": [
+      "**筛选结果概览**：按「挂牌价 15 万元以内 + 车龄 3 年内 + 能源类型 = 增程式」筛选，共命中 {{claim:c1}} 条车源；达到最小样本门槛的候选车系为 {{claim:c2}} 个。",
+      "以上均为总体聚合口径。三个车系的价格带整体落在 10.5 万 ~ 14.8 万元区间，均在你 15 万元的预算内。",
+      "推荐工具返回的聚合证据里没有车系名称字段，所以无法点名它们分别是哪款车型。"
+    ],
+    "limitations": [
+      "数据时间范围未知；“3 年内”按工具使用的车龄字段口径判定。",
+      "排序来自工具解释性权重（样本量 0.5、车龄 0.3、里程 0.2）。"
+    ]
+  },
+  "observed_failure": {
+    "status": "error",
+    "failure_code": "answer_invalid",
+    "tool_sequence": ["declare_task", "recommend", "csv_query", "load_skill", "recommend", "finalize_answer", "finalize_answer"],
+    "task_mode": "simple",
+    "plan_step_count": 0,
+    "repair_attempt_count": 2,
+    "rejection_codes": ["answer_validation_failed", "answer_repair_exhausted"],
+    "diagnostic_excerpt": "第一次条件格式与工具筛选字符串不匹配；修正后数字字符检测仍拒绝正文和限制说明。"
+  },
+  "expected_regressions": [
+    "conditions_are_checked_as_structured_facts",
+    "ordinary_prose_is_not_rejected_for_containing_numeric_characters",
+    "exhaustion_keeps_the_original_validation_diagnostic"
+  ]
+}

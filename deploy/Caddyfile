@@ -1,0 +1,11 @@
+{$APP_DOMAIN} {
+    basic_auth {
+        {$APP_USERNAME} {$APP_PASSWORD_HASH}
+    }
+    reverse_proxy frontend:80 {
+        # Flush SSE events as they arrive.
+        flush_interval -1
+        # Keep the optional API access token server-side, behind gateway auth.
+        header_up Authorization "Bearer {$APP_PUBLIC_ACCESS_TOKEN}"
+    }
+}

@@ -1,0 +1,62 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: used-car-intelligence-backend:current
+    container_name: used-car-intelligence-backend
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      OWNER_COOKIE_SECURE: "true"
+      LEGACY_OWNER_ID: "legacy-import"
+      RUNTIME_MAX_PENDING_GLOBAL: ${RUNTIME_MAX_PENDING_GLOBAL:-128}
+      RUNTIME_MAX_PENDING_PER_OWNER: ${RUNTIME_MAX_PENDING_PER_OWNER:-16}
+      RUNTIME_DAILY_TOKEN_LIMIT: ${RUNTIME_DAILY_TOKEN_LIMIT:-10000000}
+    expose:
+      - "8000"
+    volumes:
+      - agent-runtime:/app/.cache
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: used-car-intelligence-frontend:current
+    container_name: used-car-intelligence-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    expose:
+      - "80"
+    restart: unless-stopped
+
+  gateway:
+    image: caddy:2-alpine
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:?Set APP_DOMAIN to a public hostname before deploying}
+      APP_USERNAME: ${APP_USERNAME:?Set APP_USERNAME for gateway access}
+      APP_PASSWORD_HASH: ${APP_PASSWORD_HASH:?Set APP_PASSWORD_HASH with caddy hash-password}
+      APP_PUBLIC_ACCESS_TOKEN: ${APP_PUBLIC_ACCESS_TOKEN:-}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - gateway-data:/data
+      - gateway-config:/config
+    depends_on:
+      - frontend
+    restart: unless-stopped
+
+volumes:
+  agent-runtime:
+  gateway-data:
+  gateway-config:

@@ -1,0 +1,140 @@
+{
+  "version": 2,
+  "provider": "scripted_offline_only",
+  "case_id": "reliability-recommend-filters-plan-answer",
+  "input": "15 万以内、3 年内的增程式车型都有些什么",
+  "expected": {
+    "status": "done",
+    "visible_plan_steps": [
+      "筛选并整理增程式候选车系",
+      "整理并核验回答"
+    ],
+    "answer_respects_conditions": [
+      "budget_max_wan=15",
+      "max_age=3",
+      "energy_type=增程式"
+    ]
+  },
+  "responses": [
+    {
+      "tool_calls": [
+        {
+          "name": "declare_task",
+          "arguments": {
+            "goals": [
+              {
+                "id": "g1",
+                "description": "按预算、车龄和能源条件推荐车系",
+                "deliverable": "候选车系及挂牌价特征"
+              }
+            ],
+            "requires_plan": false
+          }
+        },
+        {
+          "name": "set_plan",
+          "arguments": {
+            "steps": [
+              {
+                "id": "recommend",
+                "title": "筛选并整理增程式候选车系",
+                "description": "按预算、车龄、能源和样本门槛查询候选车系",
+                "tool_names": [
+                  "recommend"
+                ],
+                "goal_ids": [
+                  "g1"
+                ],
+                "kind": "data",
+                "completion_criteria": "tool_result"
+              },
+              {
+                "id": "finalize",
+                "title": "整理并核验回答",
+                "description": "引用候选车系的本次查询结果并说明挂牌价口径",
+                "tool_names": [
+                  "finalize_answer"
+                ],
+                "goal_ids": [
+                  "g1"
+                ],
+                "kind": "finalize",
+                "completion_criteria": "validated_answer"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "recommend",
+          "arguments": {
+            "budget_max_wan": 15,
+            "energy_type": "增程式",
+            "max_age": 3,
+            "top_k": 3,
+            "min_n": 15
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "update_plan",
+          "arguments": {
+            "updates": [
+              {
+                "id": "recommend",
+                "status": "complete"
+              },
+              {
+                "id": "finalize",
+                "status": "running"
+              }
+            ]
+          }
+        },
+        {
+          "name": "finalize_answer",
+          "arguments": {
+            "schema_version": 2,
+            "result_kind": "data_answer",
+            "goal_ids": [
+              "g1"
+            ],
+            "blocks": [
+              {
+                "kind": "text",
+                "text": "符合当前筛选条件的候选包括："
+              },
+              {
+                "kind": "recommendation_table",
+                "entity_group_refs": {
+                  "$entity_group_refs": [
+                    0,
+                    1
+                  ]
+                },
+                "columns": [
+                  "series",
+                  "median_price",
+                  "sample_size"
+                ]
+              }
+            ],
+            "limitation_codes": [
+              "listing_price_not_transaction"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "protocol": {
+    "task_plan": 1,
+    "answer_schema": 2
+  }
+}
