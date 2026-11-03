@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { parseSseEvents, streamRunEvents } from './sse'
+import { parseSseEvents, streamRunEvents, type BackendRunEvent } from './sse'
 
 describe('SSE parser', () => {
   it('parses ids, event names, single/multi-line data and ignores keepalive', () => {
@@ -97,5 +97,51 @@ describe('SSE parser', () => {
     ).rejects.toThrow('SSE 请求已取消')
     expect(fetchMock).toHaveBeenCalled()
     expect(cancelled).toBe(true)
+  })
+
+  it.each([
+    ['invalid JSON', 'data: {invalid}\n\n', undefined],
+    ['onEvent throws', 'id: 1\ndata: {"seq":1}\n\n', () => { throw new Error('event callback failed') }],
+  ])('cancels and releases an open stream when %s fails', async (_name, payload, onEvent) => {
+    const cancel = vi.fn()
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) { controller.enqueue(new TextEncoder().encode(payload)) },
+      cancel,
+    })
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(stream))
+
+    await expect(streamRunEvents('/events', 0, onEvent ?? (() => undefined))).rejects.toThrow(
+      onEvent ? 'event callback failed' : 'SSE 数据格式非法',
+    )
+    expect(cancel).toHaveBeenCalledOnce()
+    expect(stream.locked).toBe(false)
+  })
+
+  it('releases an open response body when onConnected throws', async () => {
+    const cancel = vi.fn()
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) { controller.enqueue(new TextEncoder().encode(': keepalive\n\n')) },
+      cancel,
+    })
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(stream))
+
+    await expect(streamRunEvents('/events', 0, () => undefined, undefined, () => {
+      throw new Error('connect callback failed')
+    })).rejects.toThrow('connect callback failed')
+    expect(cancel).toHaveBeenCalledOnce()
+    expect(stream.locked).toBe(false)
+  })
+
+  it('preserves the parsing error when stream cancellation also rejects', async () => {
+    const cancel = vi.fn(() => Promise.reject(new Error('cleanup failed')))
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) { controller.enqueue(new TextEncoder().encode('data: {invalid}\n\n')) },
+      cancel,
+    })
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(stream))
+
+    await expect(streamRunEvents('/events', 0, () => undefined)).rejects.toThrow('SSE 数据格式非法')
+    expect(cancel).toHaveBeenCalledOnce()
+    expect(stream.locked).toBe(false)
   })
 })

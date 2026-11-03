@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import numpy as np
@@ -23,6 +24,7 @@ _HANDLERS = {
     "region_gap": region_gap,
     "age_price_relation": age_price_relation,
 }
+logger = logging.getLogger(__name__)
 _ALLOWED_PARAMS = {
     "price_distribution": {"bins"},
     "brand_profile": {"top_k"},
@@ -67,7 +69,8 @@ def run_dashboard(filters=None, snapshot=None) -> dict[str, Any]:
     for analysis_type, handler in _HANDLERS.items():
         try:
             analyses[analysis_type] = json_safe(handler(context, {}))
-        except Exception as exc:
+        except Exception:
+            logger.exception("Dashboard analysis card failed: %s", analysis_type)
             analyses[analysis_type] = {
                 "schema_version": "1.0",
                 "analysis_type": analysis_type,
@@ -85,7 +88,7 @@ def run_dashboard(filters=None, snapshot=None) -> dict[str, Any]:
                     **context.stage_counts,
                 },
                 "data": {},
-                "limitations": [str(exc)],
+                "limitations": ["该分析暂时无法完成。"],
                 "methodology": {},
             }
 

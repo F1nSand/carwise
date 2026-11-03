@@ -63,3 +63,19 @@ def test_age_bin_limit_is_checked_before_allocating_edges(monkeypatch):
     monkeypatch.setattr(age_module.np, "arange", reject_allocation)
     with pytest.raises(ValueError, match="200 bins"):
         age_price_relation(context, {"bin_width_years": .25})
+
+
+def test_dashboard_metric_failure_hides_exception_and_logs_it(monkeypatch, caplog):
+    frame = pd.DataFrame({"price_yuan": [10000], "brand_name": ["A"], "series": ["X"],
+                          "city_name": ["city"], "mileage_km": [1000], "vehicle_age_years": [2]})
+    def fail_metric(*args, **kwargs):
+        raise RuntimeError("secret=/srv/private/model.bin token=abc123")
+    monkeypatch.setitem(analysis_service._HANDLERS, "brand_profile", fail_metric)
+    result = run_dashboard({}, snapshot(frame))
+    card = result["analyses"]["brand_profile"]
+    assert card["status"] == "error"
+    assert card["limitations"] == ["该分析暂时无法完成。"]
+    assert "/srv/private" not in str(result) and "abc123" not in str(result)
+    assert "secret=/srv/private/model.bin token=abc123" in caplog.text
+    assert result["status"] == "partial_success"
+    assert result["analyses"]["price_distribution"]["status"] == "success"
