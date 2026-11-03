@@ -108,7 +108,6 @@ export async function streamRunEvents(
   })
   if (!response.ok) throw new Error(`SSE 请求失败（HTTP ${response.status}）`)
   if (!response.body) throw new Error('SSE 响应没有可读取的数据流')
-  onConnected?.()
 
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
@@ -135,6 +134,7 @@ export async function streamRunEvents(
   })
 
   try {
+    onConnected?.()
     while (true) {
       const chunk = await reader.read()
       if (chunk.done) break
@@ -142,6 +142,13 @@ export async function streamRunEvents(
     }
     parser.feed(decoder.decode())
     parser.end()
+  } catch (error) {
+    try {
+      await reader.cancel()
+    } catch {
+      // Preserve the parsing or callback error that caused cleanup.
+    }
+    throw error
   } finally {
     signal?.removeEventListener('abort', abortReader)
     reader.releaseLock()

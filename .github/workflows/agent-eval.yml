@@ -35,6 +35,10 @@ jobs:
           tests/test_event_notifier.py
           tests/test_message_protocol.py
           tests/test_mcp_adapter.py
+          tests/test_analysis_api.py
+          tests/test_analysis_edge_cases.py
+          tests/test_analysis_filters.py
+          tests/test_analysis_service.py
 
   frontend:
     if: github.event_name != 'schedule'

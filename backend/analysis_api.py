@@ -1,5 +1,6 @@
 from __future__ import annotations
 import threading
+import logging
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field, ConfigDict, StrictStr
 from backend.data_loader import get_dataset_snapshot
@@ -19,6 +20,25 @@ class DashboardPayload(BaseModel):
     expected_dataset_version: StrictStr | None = None
 
 _GATE=threading.BoundedSemaphore(2)
+logger = logging.getLogger(__name__)
+
+
+def _load_snapshot_or_503():
+    try:
+        return get_dataset_snapshot()
+    except Exception as exc:
+        logger.exception("Analysis dataset snapshot unavailable")
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "code": "dataset_unavailable",
+                "message": "数据集暂不可用，请稍后重试。",
+                "retryable": True,
+            },
+            headers={"Retry-After": "2"},
+        ) from exc
+
+
 def create_analysis_router(current_principal):
     router=APIRouter(prefix="/v1/analysis",tags=["analysis"])
     def enter():
@@ -34,13 +54,12 @@ def create_analysis_router(current_principal):
             )
     @router.get("/catalog")
     def catalog(_principal=Depends(current_principal)):
-        try:return build_catalog(get_dataset_snapshot())
-        except Exception as exc:raise HTTPException(status_code=503,detail={"code":"dataset_unavailable","message":str(exc)})
+        return build_catalog(_load_snapshot_or_503())
     @router.post("/query")
     def query(payload: QueryPayload, request: Request, _principal=Depends(current_principal)):
         enter()
         try:
-            snap=get_dataset_snapshot()
+            snap=_load_snapshot_or_503()
             if payload.expected_dataset_version and payload.expected_dataset_version!=snap.version:raise HTTPException(status_code=409,detail={"code":"dataset_changed","dataset_version":snap.version})
             try:
                 result=run_analysis(payload.analysis_type,payload.filters,payload.params,snap)
@@ -53,7 +72,7 @@ def create_analysis_router(current_principal):
     def dashboard(payload: DashboardPayload, request: Request, _principal=Depends(current_principal)):
         enter()
         try:
-            snap=get_dataset_snapshot()
+            snap=_load_snapshot_or_503()
             if payload.expected_dataset_version and payload.expected_dataset_version!=snap.version:raise HTTPException(status_code=409,detail={"code":"dataset_changed","dataset_version":snap.version})
             try:
                 result=run_dashboard(payload.filters,snap)
